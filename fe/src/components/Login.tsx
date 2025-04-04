@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Mail, Lock, User, LogIn } from "lucide-react";
+import { Mail, Lock, User, LogIn, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLoginUser } from "@/hooks/useLoginUser";
 
 const Login = () => {
+  const { mutate, isSuccess, error } = useLoginUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -20,16 +22,30 @@ const Login = () => {
 
     try {
       // Here you would implement actual authentication
-      console.log("Login attempt with:", { email, password });
-      
-      // For demo purposes, simulate successful login
-      setTimeout(() => {
+     if (email && password) {
+      setIsLoading(true);
+      mutate({
+        email,
+        password,
+      });
+
+      if(isSuccess) {
         toast({
           title: "Logged in successfully",
           description: "Welcome back to the Forecasting dashboard",
         });
         navigate("/");
-      }, 1000);
+      }
+     }
+
+     if(error) {
+      toast({
+        title: "Login failed",
+        description: `Please check your credentials and try again ${error}`,
+        variant: "destructive",
+      });
+     }
+     
     } catch (error) {
       toast({
         title: "Login failed",
@@ -93,7 +109,13 @@ const Login = () => {
               disabled={isLoading}
             >
               {isLoading ? "Logging in..." : "Login"}
-              <LogIn className="h-4 w-4" />
+             {
+              isLoading ? (
+                <Loader className="animate-spin  mr-3 h-5 w-5 " />
+              ) : (
+                <LogIn className="h-5 w-5" />
+              ) 
+             }
             </Button>
           </form>
         </CardContent>

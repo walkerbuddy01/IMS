@@ -2,10 +2,18 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Mail, Lock, User, UserPlus } from "lucide-react";
+import { Mail, Lock, User, UserPlus, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useRegisterUser } from "@/hooks/useRegister";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -16,9 +24,12 @@ const Register = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const { mutate, isSuccess, error } = useRegisterUser();
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setIsLoading(true);
+
     if (password !== confirmPassword) {
       toast({
         title: "Passwords don't match",
@@ -27,27 +38,35 @@ const Register = () => {
       });
       return;
     }
-    
-    setIsLoading(true);
+
 
     try {
       // Here you would implement actual registration
-      console.log("Registration attempt with:", { name, email, password });
-      
-      // For demo purposes, simulate successful registration
-      setTimeout(() => {
+      mutate({
+        email,
+        password,
+        fullname: name,
+      });
+
+      console.log(isSuccess);
+      if (isSuccess) {
         toast({
           title: "Account created successfully",
           description: "You can now log in to your account",
         });
         navigate("/login");
-      }, 1000);
+        setIsLoading(false);
+      }
+
+      if (error) {
+        toast({
+          title: "Registration failed",
+          description: `An error occurred during registration ${error}`,
+          variant: "destructive",
+        });
+        setIsLoading(false);
+      }
     } catch (error) {
-      toast({
-        title: "Registration failed",
-        description: "An error occurred during registration",
-        variant: "destructive",
-      });
     } finally {
       setIsLoading(false);
     }
@@ -57,7 +76,9 @@ const Register = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center space-y-1">
-          <CardTitle className="text-2xl font-bold">Create an Account</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            Create an Account
+          </CardTitle>
           <CardDescription>
             Enter your details to create your forecasting account
           </CardDescription>
@@ -124,20 +145,25 @@ const Register = () => {
                 />
               </div>
             </div>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full bg-indigo-700 hover:bg-indigo-800 h-12 flex items-center gap-2"
               disabled={isLoading}
             >
               {isLoading ? "Creating account..." : "Create Account"}
-              <UserPlus className="h-4 w-4" />
+              {
+                isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />
+              }
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
           <p className="text-sm text-gray-500">
             Already have an account?{" "}
-            <Link to="/login" className="text-indigo-700 hover:text-indigo-600 font-medium">
+            <Link
+              to="/login"
+              className="text-indigo-700 hover:text-indigo-600 font-medium"
+            >
               Sign in
             </Link>
           </p>
