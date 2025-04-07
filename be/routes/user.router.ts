@@ -1,12 +1,12 @@
 import express from "express";
 import {
-//   assignAccessToken,
-//   getCurrentUser,
+  //   assignAccessToken,
+  //   getCurrentUser,
   loginUser,
   logoutUser,
   registerUser,
-//   updatePassword,
-} from "../controllers/user.controller.ts";
+  //   updatePassword,
+} from "../controllers/user.controller";
 // import { JWTVerify } from "../middlewares/auth.middleware.js";
 const router = express.Router();
 

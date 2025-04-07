@@ -19,6 +19,17 @@ export interface IUser extends Document {
   isPasswordCorrect(candidatePassword: string): Promise<boolean>;
 }
 
+const generateAccessToken = async (userId: string) => {
+  try {
+    const user: any = await User.findById(userId);
+    const accessToken = user.generateAccessToken();
+    await user.save({ validateBeforeSave: false });
+    return accessToken ;
+  } catch (error) {
+    return new apiError(500, `Internal Server Error ${error}`);
+  }
+};
+
 const registerUser = asyncHandler(async (req: Request, res: Response) => {
   console.log(req.body);
   const { fullname, email, password } = req.body;
@@ -63,7 +74,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
   });
 
   const user = await User.findById(createdUser._id).select(
-    "-password -refreshToken"
+    "-password "
   );
 
   if (!user) {
@@ -71,13 +82,12 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
   }
 
   return res
-    .status(201)
-    .json(new ApiResponse(201, user, "User created successfully"));
+    .status(200)
+    .json(new ApiResponse(200, user, "User created successfully"));
 });
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const bodycontain = req.body;
-  console.log(req.body);
 
   if (!bodycontain.email) {
     return new apiError(401, " email is required");
@@ -88,42 +98,34 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     $or: [{ email: bodycontain.email }],
   });
 
+  const token = await generateAccessToken(user?._id as any);
+
+  console.log(token.accessToken);
+
   if (!user) {
-    throw new apiError(404, "User with the given credentials is not found");
+    return new apiError(404, "User with the given credentials is not found");
   }
 
   if (!bodycontain.password) {
-    throw new apiError(401, "Password is requied");
+    return new apiError(401, "Password is requied");
   }
 
-  const updatedUser = await User.findById(user._id)?.select(" -password ");
+  const updatedUser = await User.findById(user._id)?.select("password");
 
   const option = {
     httpOnly: true,
     secure: true,
-  };
+  }; //cookie option
 
-  res
+  res.cookie("accessToken", token, option);
+
+  return res
     .status(200)
     .json(new ApiResponse(201, updatedUser, "user logged in successfully"));
 });
 
 const logoutUser = asyncHandler(async (req: Request, res: Response) => {
   const { email } = req.body;
-  await User.findOneAndUpdate(
-    {
-      email,
-    },
-    {
-      $set: {
-        refreshToken: "",
-      },
-    },
-    {
-      new: true,
-    }
-  );
-
   const option = {
     httpOnly: true,
     secure: true,
@@ -132,47 +134,8 @@ const logoutUser = asyncHandler(async (req: Request, res: Response) => {
   res
     .status(200)
     .clearCookie("accessToken", option)
-    .clearCookie("refreshToken", option)
     .json(new ApiResponse(200, {}, "User loggedOut"));
 });
-
-// const assignAccessToken = asyncHandler(async (req: Request, res: Response) => {
-//   const UserRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
-
-//   if (!UserRefreshToken) {
-//     throw new apiError(404, "No refreshToken found");
-//   }
-
-//   const decodedData = jwt.verify(
-//     UserRefreshToken,
-//     process.env.REFRESH_TOKEN_SECRET
-//   );
-
-//   const user = await User.findById(decodedData._id);
-//   if (!user) {
-//     throw new apiError(400, "Invaild refresh token and user");
-//   }
-//   if (user.refreshToken !== UserRefreshToken) {
-//     throw new apiError(400, "Invaild refresh Token");
-//   }
-
-//   const { refreshToken, accessToken } = await generateAccessaAndRefreshToken(
-//     user._id
-//   );
-
-//   user.refreshToken = refreshToken;
-//   user.save({
-//     validateBeforeSave: false,
-//   });
-
-//   return res
-//     .status(200)
-//     .cookie("accessToken", accessToken)
-//     .cookie("refreshToken", refreshToken)
-//     .json(
-//       new ApiResponse(200, { refreshToken }, "Token assigned successfully")
-//     );
-// });
 
 // const getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
 //   const userDetail = req.user;
@@ -185,7 +148,7 @@ const logoutUser = asyncHandler(async (req: Request, res: Response) => {
 //   const { oldPassword, newPassword } = req.body;
 
 //   if (!oldPassword || !newPassword) {
-//     throw new apiError(404, "Please send the required fields");
+//     return new apiError(404, "Please send the required fields");
 //   }
 
 //   const user = await User.findById(req.user._id);
@@ -193,7 +156,7 @@ const logoutUser = asyncHandler(async (req: Request, res: Response) => {
 //   const oldPasswordValidation = await user.isPasswordCorrect(oldPassword);
 
 //   if (!oldPasswordValidation) {
-//     throw new apiError(401, "password is wrong!");
+//     return new apiError(401, "password is wrong!");
 //   }
 
 //   user.password = newPassword;

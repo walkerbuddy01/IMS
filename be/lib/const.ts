@@ -7,4 +7,6 @@ enum HttpStatusCode {
   SERVER_ERROR = 500,
 }
 
-export { HttpStatusCode };
+const PrivateKey = "supersecretkey";
+
+export { HttpStatusCode, PrivateKey };
