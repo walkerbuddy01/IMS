@@ -110,7 +110,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     return new apiError(401, "Password is requied");
   }
 
-  const updatedUser = await User.findById(user._id)?.select("password");
+  const updatedUser = await User.findById(user._id)?.select("-password");
 
   const option = {
     httpOnly: true,
@@ -137,12 +137,12 @@ const logoutUser = asyncHandler(async (req: Request, res: Response) => {
     .json(new ApiResponse(200, {}, "User loggedOut"));
 });
 
-// const getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
-//   const userDetail = req.user;
-//   return res
-//     .status(200)
-//     .json(new ApiResponse(200, userDetail, "User is loggedIn"));
-// });
+const getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
+  const {} = req.body;
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "", "User is loggedIn"));
+});
 
 // const updatePassword = asyncHandler(async (req: Request, res: Response) => {
 //   const { oldPassword, newPassword } = req.body;

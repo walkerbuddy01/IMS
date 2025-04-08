@@ -47,6 +47,9 @@ app.listen(port, () => {
 
 // routers
 import userRouter from "./routes/user.router";
+import productRouter from "./routes/product.route";
+
+app.use("/api/v1/product", productRouter);
 app.use("/api/v1/user", userRouter);
 
 export default app;
