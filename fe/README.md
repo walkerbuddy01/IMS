@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/6b48f0d6-eaf1-4a6f-8b42-a2a8c9e809f3
+**URL**: https://lovable.dev/projects/646830af-e23e-45a4-840b-3506fe5650c0
 
 ## How can I edit this code?
 
@@ -10,7 +10,7 @@ There are several ways of editing your application.
 
 **Use Lovable**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/6b48f0d6-eaf1-4a6f-8b42-a2a8c9e809f3) and start prompting.
+Simply visit the [Lovable Project](https://lovable.dev/projects/646830af-e23e-45a4-840b-3506fe5650c0) and start prompting.
 
 Changes made via Lovable will be committed automatically to this repo.
 
@@ -52,7 +52,7 @@ npm run dev
 
 ## What technologies are used for this project?
 
-This project is built with .
+This project is built with:
 
 - Vite
 - TypeScript
@@ -62,11 +62,11 @@ This project is built with .
 
 ## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/6b48f0d6-eaf1-4a6f-8b42-a2a8c9e809f3) and click on Share -> Publish.
+Simply open [Lovable](https://lovable.dev/projects/646830af-e23e-45a4-840b-3506fe5650c0) and click on Share -> Publish.
 
 ## Can I connect a custom domain to my Lovable project?
 
-Yes it is!
+Yes, you can!
 
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
