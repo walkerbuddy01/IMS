@@ -48,8 +48,14 @@ app.listen(port, () => {
 // routers
 import userRouter from "./routes/user.router";
 import productRouter from "./routes/product.route";
+import supplierRouter from "./routes/supplier.route"
+import warehouseRouter from "./routes/warehouse.route"
+import freightOptionRouter from "./routes/frieght.route"
 
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/supplier", supplierRouter)
+app.use("/api/v1/warehouse", warehouseRouter)
+app.use("/api/v1/freightOption", freightOptionRouter)
 
 export default app;

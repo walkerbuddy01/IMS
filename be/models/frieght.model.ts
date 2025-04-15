@@ -10,5 +10,8 @@ export const freightOptionSchema = new mongoose.Schema({
     cost: { type: Number, min: 0 },
     leadTimeDays: { type: Number, min: 0 }
   });
+
+  const FreightOption = mongoose.model("FreightOption", freightOptionSchema);
+  export default FreightOption
    
 

@@ -26,7 +26,7 @@ const generateAccessToken = async (userId: string) => {
     await user.save({ validateBeforeSave: false });
     return accessToken ;
   } catch (error) {
-    return new apiError(500, `Internal Server Error ${error}`);
+    return new apiError(HttpStatusCode.BAD_REQUEST, `Internal Server Error ${error}`);
   }
 };
 

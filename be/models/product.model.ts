@@ -1,4 +1,5 @@
-import mongoose, { Document, Schema } from "mongoose";
+
+import mongoose, { Schema } from "mongoose";
 export interface Product {
   _id?: string;
   sku: string;
@@ -32,60 +33,67 @@ export interface Product {
 
 const productSchema = new mongoose.Schema(
   {
-    title: { type: String },
+    // Product Details Tab ---------------------------------------------------------------
+    title: { type: String, required: true },
     sku: { type: String, required: true, unique: true },
-    barcode: { type: String },
-    category: { type: String },
-
-    price: { type: Number }, // duplicate of pricing.retail (optional redundancy)
-    stock: { type: Number }, // duplicate of inventory.quantity (optional redundancy)
-    description: { type: String },
-    status: { type: String, enum: ["active", "draft"], default: "draft" },
+    barcode: { type: String, required: true , unique: true},
+    ProductImageUrl: { type: String, required: true }, //ImageKit Url,
+    supplierId: { type: Schema.Types.ObjectId, ref: "Supplier", required: true },
 
     dimensions: {
-      length: { type: Number },
-      width: { type: Number },
-      height: { type: Number },
-      weight: { type: Number }, // included inside dimensions as per frontend
+      length: { type: Number, required: true },
+      width: { type: Number, required: true },
+      height: { type: Number, required: true },
+      weight: { type: Number, required: true }, // included inside dimensions as per frontend
     },
+    status: { type: String, enum: ["active", "draft"], default: "draft",  },
 
+    // Shipping Tab ---------------------------------------------------------------
     shipping: {
       carton: {
-        weight: { type: Number },
-        length: { type: Number },
-        width: { type: Number },
-        height: { type: Number },
+        weight: { type: Number, required: true },
+        length: { type: Number, required: true },
+        width: { type: Number, required: true },
+        height: { type: Number, required: true },
+       
       },
-      countryOrigin: { type: String },
-      hsCode: { type: String },
-      customsDescription: { type: String },
-      freight: { type: [String] }, // e.g., ["AIR", "SEA"]
+      countryOrigin: { type: String, required: true },
+      hsCode: { type: String, required: true },
+      customsDescription: { type: String, required: true },
+
     },
 
+    // Inventory Tab ---------------------------------------------------------------
     inventory: {
-      warehouses: { type: [String] },
-      emergencyStockLevel: { type: Number },
-      moq: { type: Number },
-      leadTime: { type: Number },
+      warehouse: {
+        type: Schema.Types.ObjectId,
+        ref: "Warehouse",
+        required: true,
+      },
+      quantity: { 
+        type: Number,
+        default: 0,
+       },
+      emergencyStockLevel: { type: Number, required: true },
+      moq: { type: Number, required: true },
+      productleadTime: { type: Number, required: true },
+     
     },
 
     pricing: {
-      cogs: { type: Number },
-      retail: { type: Number },
+      originalPrice: { type: Number, required: true },
+      cogs: { type: Number, required: true },
+      retail: { type: Number, required: true },
+    },
+    paymentTerms: { type: String, required: true },
+    freight: {
+      type: Schema.Types.ObjectId,
+      ref: "FreightOption",
+      required: true, // e.g., ["AIR", "SEA"]
     },
 
-    supplier: { type: String },
-    paymentTerms: { type: String },
-
-    customFields: [
-      {
-        name: { type: String },
-        value: { type: mongoose.Schema.Types.Mixed },
-      },
-    ],
-
-    imageUrl: { type: String },
-  },
+    }, 
+  
   { timestamps: true }
 );
 

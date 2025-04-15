@@ -1,9 +1,9 @@
 import express from "express";
-import { createSupplier } from "../controllers/supplier.controller";
+import { createFreightOption } from "../controllers/frieght.controller";
 
 const router = express.Router();
 
 // Create new supplier
-router.post("/", createSupplier);
+router.post("/", createFreightOption);
 
 export default router;
