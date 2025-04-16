@@ -1,37 +1,59 @@
 
-import mongoose, { Schema } from "mongoose";
-export interface Product {
-  _id?: string;
+import mongoose, { Document, Schema, Types } from "mongoose";
+
+
+export interface IProduct extends Document {
+  title: string;
   sku: string;
-  name: string;
-  productType: string;
-  tags: string[];
-  weight: number;
-  declaredValue: number;
-  costOfGoodsValue: number;
-  countryOfManufacturer: string;
-  quantity: number;
-  status: "Active" | "Draft";
-  title?: string;
-  barcode?: string;
-  hsCode?: string;
+  barcode: string;
+  ProductImageUrl: string;
+  supplierId: Types.ObjectId;
+
   dimensions: {
     length: number;
     width: number;
     height: number;
+    weight: number;
   };
-  supplier?: string;
-  warehouse?: string[];
-  emergencyStockLevel?: number;
-  moq?: number;
-  productionLeadTime?: number;
-  coo?: string;
-  retailPrice?: number;
-  paymentTerms?: string;
-  freightOptions?: string[];
+
+  status: "active" | "draft";
+
+  shipping: {
+    carton: {
+      weight: number;
+      length: number;
+      width: number;
+      height: number;
+    };
+    countryOrigin: string;
+    hsCode: string;
+    customsDescription: string;
+  };
+
+  inventory: {
+    warehouseId: Types.ObjectId;
+    quantity: number;
+    emergencyStockLevel: number;
+    moq: number;
+    productleadTime: number;
+  };
+
+  pricing: {
+    originalPrice: number;
+    cogs: number;
+    retail: number;
+  };
+
+  paymentTerms: string;
+  freight: Types.ObjectId;
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-const productSchema = new mongoose.Schema(
+
+
+const productSchema = new Schema<IProduct>(
   {
     // Product Details Tab ---------------------------------------------------------------
     title: { type: String, required: true },
@@ -39,7 +61,11 @@ const productSchema = new mongoose.Schema(
     barcode: { type: String, required: true , unique: true},
     ProductImageUrl: { type: String, required: true }, //ImageKit Url,
     supplierId: { type: Schema.Types.ObjectId, ref: "Supplier", required: true },
-
+    // userId:{
+    //   type: Schema.Types.ObjectId,
+    //   ref: "User",
+    //   required: true,
+    // },   //TODO : Adding after authentication done
     dimensions: {
       length: { type: Number, required: true },
       width: { type: Number, required: true },
@@ -65,7 +91,7 @@ const productSchema = new mongoose.Schema(
 
     // Inventory Tab ---------------------------------------------------------------
     inventory: {
-      warehouse: {
+      warehouseId: {
         type: Schema.Types.ObjectId,
         ref: "Warehouse",
         required: true,

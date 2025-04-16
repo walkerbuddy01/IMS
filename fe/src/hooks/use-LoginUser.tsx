@@ -1,30 +1,31 @@
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
-import { toast } from './use-toast';
-import { useNavigate } from 'react-router-dom';
- 
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { toast } from "./use-toast";
+import { useNavigate } from "react-router-dom";
+
 interface LoginPayload {
   email: string;
   password: string;
 }
- 
+
 interface LoginResponse {
   statusCode: number;
   data: any; // Update this to the actual shape if needed
   message: string;
 }
- 
+
 export const useLoginUser = () => {
   const navigate = useNavigate();
   return useMutation<LoginResponse, unknown, LoginPayload>({
-    mutationFn: async (credentials) => {
+    mutationFn: async (payload) => {
       try {
         const response = await axios.post(
-          'http://localhost:8000/api/v1/user/login',
-          credentials,
+          "http://localhost:8000/api/v1/user/login",
+          payload,
           {
+            withCredentials: true,
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
           }
         );

@@ -5,10 +5,12 @@ import connectDB from "./db/db";
 import { default as cookieParser } from "cookie-parser";
 dotenv.config();
 
+// TODO: limiting the requests (express-limiter)
+
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
 
 const port = process.env.PORT || 3000;
 
@@ -18,7 +20,7 @@ connectDB()
       console.log(`Error occured on the connecting db ${error}`);
     });
     app.listen(process.env.port || 8000, () => {
-      console.log(`Server is listening at PORT:${process.env.PORT}`);
+      console.log(`DB Connected`);
     });
   })
   .catch((err) => {
@@ -42,7 +44,7 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Server app listening on port ${port}`);
 });
 
 // routers

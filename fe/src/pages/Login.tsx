@@ -44,11 +44,17 @@ const Login = () => {
     <div className="flex min-h-screen">
       {/* Left side - Login Form */}
       <div className="flex-1 flex flex-col justify-between p-8 lg:p-12">
+       
         {/* Logo */}
         <div className="mb-12">
-          <Link to="/" className="text-2xl font-bold leading-tight tracking-tight">
+          <Link
+            to="/"
+            className="text-2xl font-bold leading-tight tracking-tight"
+          >
             KOVORA
-            <p className="text-xs text-black poppins-regular mt-1">CONSULTANTS</p>
+            <p className="text-xs text-black poppins-regular mt-1">
+              CONSULTANTS
+            </p>
           </Link>
         </div>
 

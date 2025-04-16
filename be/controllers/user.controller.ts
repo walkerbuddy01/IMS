@@ -24,9 +24,12 @@ const generateAccessToken = async (userId: string) => {
     const user: any = await User.findById(userId);
     const accessToken = user.generateAccessToken();
     await user.save({ validateBeforeSave: false });
-    return accessToken ;
+    return accessToken;
   } catch (error) {
-    return new apiError(HttpStatusCode.BAD_REQUEST, `Internal Server Error ${error}`);
+    return new apiError(
+      HttpStatusCode.BAD_REQUEST,
+      `Internal Server Error ${error}`
+    );
   }
 };
 
@@ -35,62 +38,57 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
   const { fullname, email, password } = req.body;
 
   if ([fullname, email, password].some((field) => field.trim() === "")) {
-    return new apiError(400, "Please fill all the fields");
-  }
-
-  if (email.includes("@")) {
-    const vaildDomains = [
-      "gmail.com",
-      "yahoo.com",
-      "outlook.com",
-      "hotmail.com",
-    ];
-    const domain = email.split("@")[1];
-    //TODO: Please complete this validation
-  } else {
     return new apiError(
-      400,
-      "Please Enter the vaild email:Which contain the '@' symbol"
+      HttpStatusCode.BAD_REQUEST,
+      "Please fill all the fields"
     );
   }
 
   //Query in the database
-  const existedUser = await User.findOne({
-    $or: [{ email }],
-  });
+  const existedUser = await User.findOne({ email });
   if (existedUser) {
     return new apiError(
-      409,
+      HttpStatusCode.CONFLICT,
       "User with this email and password already existed"
     );
   }
 
-  const createdUser = await User.create({
-    fullname,
-    email,
-    password,
-    avatar: fullname.toUpperCase()[0],
-    refreshToken: "",
-  });
+  try {
+    const createdUser = await User.create({
+      fullname,
+      email,
+      password,
+      avatar: fullname.toUpperCase()[0],
+    });
 
-  const user = await User.findById(createdUser._id).select(
-    "-password "
-  );
+    const user = await User.findById(createdUser._id).select("-password ");
 
-  if (!user) {
-    return new apiError(500, "Server failed to create user please try again");
+    if (!user) {
+      return new apiError(
+        HttpStatusCode.SERVER_ERROR,
+        "Server failed to create user please try again"
+      );
+    }
+
+    return res
+      .status(HttpStatusCode.CREATED)
+      .json(
+        new ApiResponse(
+          HttpStatusCode.CREATED,
+          user,
+          "User created successfully"
+        )
+      );
+  } catch (error) {
+    return new apiError(HttpStatusCode.SERVER_ERROR, "Internal Server Error");
   }
-
-  return res
-    .status(200)
-    .json(new ApiResponse(200, user, "User created successfully"));
 });
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const bodycontain = req.body;
 
   if (!bodycontain.email) {
-    return new apiError(401, " email is required");
+    return new apiError(HttpStatusCode.NOT_FOUND, " email is required");
   }
 
   const user = await User.findOne({
@@ -100,27 +98,44 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
 
   const token = await generateAccessToken(user?._id as any);
 
-  console.log(token.accessToken);
-
   if (!user) {
-    return new apiError(404, "User with the given credentials is not found");
+    res
+      .status(HttpStatusCode.NOT_FOUND)
+      .json(new apiError(HttpStatusCode.NOT_FOUND, "User not found"));
+    return;
   }
 
   if (!bodycontain.password) {
-    return new apiError(401, "Password is requied");
+    res
+      .status(HttpStatusCode.NOT_FOUND)
+      .json(new apiError(HttpStatusCode.NOT_FOUND, "Password is required"));
+    return;
+  }
+
+  const isPasswordCorrect = await user.isPasswordCorrect(bodycontain.password);
+
+  if (!isPasswordCorrect) {
+    res
+      .status(HttpStatusCode.UNAUTHORIZED)
+      .json(
+        new ApiResponse(
+          HttpStatusCode.UNAUTHORIZED,
+          "",
+          "Password is incorrect"
+        )
+      );
+    return;
   }
 
   const updatedUser = await User.findById(user._id)?.select("-password");
 
-  const option = {
-    httpOnly: true,
-    secure: true,
-  }; //cookie option
-
-  res.cookie("accessToken", token, option);
-
   return res
     .status(200)
+    .cookie("accessToken", token, {
+      httpOnly: true,
+      secure: false,
+      // sameSite: "lax",
+    })
     .json(new ApiResponse(201, updatedUser, "user logged in successfully"));
 });
 
@@ -139,9 +154,7 @@ const logoutUser = asyncHandler(async (req: Request, res: Response) => {
 
 const getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
   const {} = req.body;
-  return res
-    .status(200)
-    .json(new ApiResponse(200, "", "User is loggedIn"));
+  return res.status(200).json(new ApiResponse(200, "", "User is loggedIn"));
 });
 
 // const updatePassword = asyncHandler(async (req: Request, res: Response) => {

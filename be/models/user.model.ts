@@ -1,7 +1,25 @@
-import  { Schema, model } from "mongoose";
+import  { Model, Schema, model } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-const userSchema = new Schema(
+
+interface IUser {
+  email: string;
+  fullname: string;
+  avatar: string;
+  password: string;
+}
+
+// 2. Interface for instance methods
+interface IUserMethods {
+  isPasswordCorrect(plainPassword: string): Promise<boolean>;
+  generateAccessToken(): string;
+}
+
+// 3. Combine to make model type
+export type UserModel = Model<IUser, {}, IUserMethods>;
+
+
+const userSchema = new Schema<IUser, UserModel, IUserMethods>(
   {
     email: {
       type: String,
@@ -51,7 +69,6 @@ userSchema.methods.generateAccessToken = function () {
     {
       _id: this._id,
       email: this.email,
-      username: this.username,
     },
     process.env.ACCESS_TOKEN_SECRET!,
   );
