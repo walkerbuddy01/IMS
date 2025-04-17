@@ -160,8 +160,8 @@ export const getProductById = asyncHandler(
 
     try {
       const product = await Product.findById(productId)
-      .populate("supplierId")
-      .populate("inventory.warehouseId");
+        .populate("supplierId")
+        .populate("inventory.warehouseId");
 
       if (!product) {
         res
@@ -196,41 +196,175 @@ export const getProductById = asyncHandler(
 );
 
 // Update a product by ID
-export const updateProduct = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!product) {
-      res.status(404).json({ message: "Product not found" });
+export const updateProduct = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const productId = req.params.id;
+    const updates = req.body;
+
+    // TODO: Add User Validation
+
+    if (!productId) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .json(
+          new ApiError(HttpStatusCode.BAD_REQUEST, "Product ID not provided")
+        );
       return;
     }
-    res.json(product);
-  } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
+
+    try {
+      // Optional SKU format validation if it's being updated
+      if (updates.sku && !/^[A-Z0-9\-]+$/.test(updates.sku)) {
+        res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .json(new ApiError(HttpStatusCode.BAD_REQUEST, "Invalid SKU format"));
+        return;
+      }
+
+      // Check if SKU or barcode already exists (excluding the current product)
+
+      const orConditions = [];
+      if (updates.sku) orConditions.push({ sku: updates.sku });
+      if (updates.barcode) orConditions.push({ barcode: updates.barcode });
+
+      if (orConditions.length > 0) {
+        const conflictProduct = await Product.findOne({
+          _id: { $ne: productId },
+          $or: orConditions,
+        });
+
+        if (conflictProduct) {
+          res
+            .status(HttpStatusCode.BAD_REQUEST)
+            .json(
+              new ApiError(
+                HttpStatusCode.BAD_REQUEST,
+                "Another product with this SKU or Barcode already exists"
+              )
+            );
+          return;
+        }
+      }
+
+      // Optional: validate supplierId if being updated
+      if (updates.supplierId) {
+        const supplier = await Supplier.findById(updates.supplierId);
+        if (!supplier) {
+          res
+            .status(HttpStatusCode.NOT_FOUND)
+            .json(
+              new ApiError(
+                HttpStatusCode.NOT_FOUND,
+                "Supplier with this ID does not exist"
+              )
+            );
+          return;
+        }
+      }
+
+      // Optional: validate warehouseId if being updated
+      if (updates.warehouseId) {
+        const warehouse = await Warehouse.find({
+          _id: { $in: updates.warehouseId },
+        });
+        if (!warehouse || warehouse.length === 0) {
+          res
+            .status(HttpStatusCode.NOT_FOUND)
+            .json(
+              new ApiError(
+                HttpStatusCode.NOT_FOUND,
+                "Warehouse with this ID does not exist"
+              )
+            );
+          return;
+        }
+      }
+
+      const updatedProduct = await Product.findByIdAndUpdate(
+        productId,
+        { $set: updates },
+        {
+          new: true,
+          runValidators: true,
+        }
+      )
+        .populate("supplierId")
+        .populate("inventory.warehouseId")
+        .populate("freight");
+
+      if (!updatedProduct) {
+        res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .json(new ApiError(HttpStatusCode.BAD_REQUEST, "Product not found"));
+        return;
+      }
+
+      res
+        .status(HttpStatusCode.UPDATED)
+        .json(
+          new ApiResponse(
+            HttpStatusCode.UPDATED,
+            updatedProduct,
+            "Product updated successfully"
+          )
+        );
+    } catch (error) {
+      console.error("Update product error:", error);
+      res
+        .status(HttpStatusCode.SERVER_ERROR)
+        .json(
+          new ApiError(HttpStatusCode.SERVER_ERROR, (error as Error).message)
+        );
+    }
   }
-};
+);
 
 // Delete a product by ID
-export const deleteProduct = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const product = await Product.findByIdAndDelete(req.params.id);
-    if (!product) {
-      res.status(404).json({ message: "Product not found" });
+export const deleteProduct = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const productId = req.params.id;
+
+    if (!productId) {
+      res
+        .status(HttpStatusCode.NOT_FOUND)
+        .json(new ApiError(HttpStatusCode.NOT_FOUND, "Product ID is required"));
       return;
     }
-    res.json({ message: "Product deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: (error as Error).message });
+
+    try {
+      const deletedProduct = await Product.findByIdAndDelete(productId);
+
+      if (!deletedProduct) {
+        res
+          .status(HttpStatusCode.NOT_FOUND)
+          .json(
+            new ApiError(
+              HttpStatusCode.NOT_FOUND,
+              "Product with the given ID not found"
+            )
+          );
+        return;
+      }
+
+      res
+        .status(HttpStatusCode.DELETED)
+        .json(
+          new ApiResponse(
+            HttpStatusCode.DELETED,
+            deletedProduct,
+            "Product deleted successfully"
+          )
+        );
+    } catch (error) {
+      console.error("Delete product error:", error);
+      res
+        .status(HttpStatusCode.SERVER_ERROR)
+        .json(
+          new ApiError(HttpStatusCode.SERVER_ERROR, (error as Error).message)
+        );
+    }
   }
-};
+);
 
 // TODO : After Authentication controllers
 

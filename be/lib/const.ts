@@ -1,5 +1,9 @@
 enum HttpStatusCode {
-  CREATED = 200,
+  CREATED = 201,
+  UPDATED = 200,
+  OK = 200,
+  DELETED = 204,
+  NOT_MODIFIED = 304,
   BAD_REQUEST = 400,
   UNAUTHORIZED = 401,
   CONFLICT = 409,

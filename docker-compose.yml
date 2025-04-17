@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo
+    container_name: dev-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    build: ./be
+    container_name: dev-backend
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://admin:password@mongo:27017
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./be:/app
+    command: bun run index.ts
+
+  frontend:
+    build: ./fe
+    container_name: dev-frontend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+    volumes:
+      - ./fe:/app
+    environment:
+      BACKEND_URL: http://localhost:5000
+
+volumes:
+  mongo_data:

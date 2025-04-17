@@ -5,7 +5,7 @@ const connectDB = async () => {
     const connectionInstance = await mongoose.connect(
       `${process.env.MONGODB_URI}/IMS?authSource=admin`
     );
-    console.log("MongoDB connected");
+    
   } catch (error: any) {
     console.log(`ERROR: occured in the connecting DB : ${error.message}`);
     process.exit(1);

@@ -7,7 +7,6 @@ dotenv.config();
 
 // TODO: limiting the requests (express-limiter)
 
-
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -43,21 +42,28 @@ app.use(
 app.use(express.static("public"));
 app.use(cookieParser());
 
+
+app.get("/", (req, res) => {
+  
+  res.send("Hello World!");
+});
+
 app.listen(port, () => {
+  console.log("MongoDB connected", process.env.MONGODB_URI);
   console.log(`Server app listening on port ${port}`);
 });
 
 // routers
 import userRouter from "./routes/user.router";
 import productRouter from "./routes/product.route";
-import supplierRouter from "./routes/supplier.route"
-import warehouseRouter from "./routes/warehouse.route"
-import freightOptionRouter from "./routes/frieght.route"
+import supplierRouter from "./routes/supplier.route";
+import warehouseRouter from "./routes/warehouse.route";
+import freightOptionRouter from "./routes/frieght.route";
 
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/user", userRouter);
-app.use("/api/v1/supplier", supplierRouter)
-app.use("/api/v1/warehouse", warehouseRouter)
-app.use("/api/v1/freightOption", freightOptionRouter)
+app.use("/api/v1/supplier", supplierRouter);
+app.use("/api/v1/warehouse", warehouseRouter);
+app.use("/api/v1/freightOption", freightOptionRouter);
 
 export default app;

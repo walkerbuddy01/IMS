@@ -1,12 +1,10 @@
-import { asyncHandler } from "../lib/AsyncHandler.ts";
-import { User } from "../models/user.model.js";
-import apiError from "../lib/ApiError.ts";
-import ApiResponse from "../lib/ApiResponse.ts";
-import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
-import { HttpStatusCode } from "../lib/const.ts";
 import type { Request, Response } from "express";
 import { Document } from "mongoose";
+import apiError from "../lib/ApiError.ts";
+import ApiResponse from "../lib/ApiResponse.ts";
+import { asyncHandler } from "../lib/AsyncHandler.ts";
+import { HttpStatusCode } from "../lib/const.ts";
+import { User } from "../models/user.model.js";
 
 export interface IUser extends Document {
   email: string;
@@ -180,10 +178,6 @@ const getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
 // });
 
 export {
-  registerUser,
   loginUser,
-  logoutUser,
-  // assignAccessToken,
-  // getCurrentUser,
-  // updatePassword,
+  logoutUser, registerUser
 };
