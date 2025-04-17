@@ -11,7 +11,7 @@ import { authMiddleware } from "../middlewares/auth.middleware";
 // import { JWTVerify } from "../middlewares/auth.middleware.js";
 const router = express.Router();
 
-router.route("/login").post(authMiddleware,loginRequestLimiter, loginUser);
+router.route("/login").post(loginRequestLimiter, loginUser);
 router.route("/register").post(loginRequestLimiter, registerUser);
 router.route("/logout").post(loginRequestLimiter, logoutUser);
 // router.route("/getCurrentUser").get( getCurrentUser);
