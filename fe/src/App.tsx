@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Inventory from "./pages/Inventory";
 import NotFound from "./pages/NotFound";
 import DashboardLayout from "./components/DashboardLayout";
+import ProductList from "./pages/ProductList";
 
 const queryClient = new QueryClient();
 
@@ -32,7 +33,7 @@ const App = () => (
             <Route path="/inventory" element={<Inventory />} />
             <Route path="/sale-forecast" element={<Dashboard />} /> {/* Placeholder */}
             <Route path="/inventory-forecast" element={<Dashboard />} /> {/* Placeholder */}
-            <Route path="/product-list" element={<Dashboard />} /> {/* Placeholder */}
+            <Route path="/product-list" element={<ProductList />} /> {/* Placeholder */}
             <Route path="/packing-list" element={<Dashboard />} /> {/* Placeholder */}
             <Route path="/shipping-lead-time" element={<Dashboard />} /> {/* Placeholder */}
             <Route path="/sale-data-input" element={<Dashboard />} /> {/* Placeholder */}
