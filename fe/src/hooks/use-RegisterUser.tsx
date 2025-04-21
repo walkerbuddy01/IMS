@@ -24,6 +24,7 @@ export const useRegisterUser = () => {
         "http://localhost:8000/api/v1/user/register",
         userData,
         {
+          withCredentials: true,
           headers: {
             "Content-Type": "application/json",
           },

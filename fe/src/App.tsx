@@ -12,6 +12,7 @@ import Inventory from "./pages/Inventory";
 import NotFound from "./pages/NotFound";
 import DashboardLayout from "./components/DashboardLayout";
 import ProductList from "./pages/ProductList";
+import SuppliersList from "./pages/Supplier";
 
 const queryClient = new QueryClient();
 
@@ -37,7 +38,7 @@ const App = () => (
             <Route path="/packing-list" element={<Dashboard />} /> {/* Placeholder */}
             <Route path="/shipping-lead-time" element={<Dashboard />} /> {/* Placeholder */}
             <Route path="/sale-data-input" element={<Dashboard />} /> {/* Placeholder */}
-            <Route path="/suppliers-list" element={<Dashboard />} /> {/* Placeholder */}
+            <Route path="/suppliers-list" element={<SuppliersList />} /> {/* Placeholder */}
             <Route path="/settings" element={<Dashboard />} /> {/* Placeholder */}
           </Route>
           

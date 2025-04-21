@@ -12,14 +12,90 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Package, Truck, ClipboardList } from "lucide-react";
+import { useCreateProduct } from "@/hooks/useCreateProduct";
+import { toast } from "sonner";
 
 interface ProductFormProps {
   onClose: () => void;
 }
 
+// {
+//   "title": "Super Widget 3000",
+//   "sku": "SW3000-0032",
+//   "barcode": "1234567890423",
+//   "originalPrice": 25.5,
+//   "cogs": 20.0,
+//   "retail": 49.99,
+//   "supplierId": "6801f7fb8be1eb8cd8a429bf",
+//   "warehouseId": "67fe3cea5632b7bebd2549d8",
+//   "emergencyStockLevel": 10,
+//   "moq": 50,
+//   "productionLeadTime": 7,
+//   "freightId": "67fe40f062c92e7f85655235",
+//   "paymentTerms": "Net 30",
+//   "ProductImageUrl": "https://example.com/images/product1.jpg",
+//   "status": "active",
+//   "cartonWeight": 12.5,
+//   "cartonLength": 60,
+//   "cartonWidth": 40,
+//   "cartonHeight": 30,
+//   "countryOrigin": "China",
+//   "hsCode": "84733020",
+//   "customsDescription": "High-performance industrial widget",
+//   "productLength": 20,
+//   "productWidth": 15,
+//   "productHeight": 10,
+//   "productWeight": 1.2
+// }
+
 export default function ProductForm({ onClose }: ProductFormProps) {
+  const [form, setForm] = useState({
+    title: "",
+    sku: "",
+    barcode: "",
+    originalPrice: 0,
+    cogs: 0,
+    retail: 0,
+    supplierId: "6801f7fb8be1eb8cd8a429bf",
+    warehouseId: "67fe3cea5632b7bebd2549d8",
+    emergencyStockLevel: 0,
+    moq: 0,
+    productionLeadTime: 0,
+    freightId: "67fe40f062c92e7f85655235",
+    paymentTerms: "",
+    ProductImageUrl: "https://example.com/images/product1.jpg",
+    status: "active",
+    cartonWeight: 0,
+    cartonLength: 0,
+    cartonWidth: 0,
+    cartonHeight: 0,
+    countryOrigin: "",
+    hsCode: "",
+    customsDescription: "",
+    productLength: 0,
+    productWidth: 0,
+    productHeight: 0,
+    productWeight: 0,
+  });
+  
+
+  const { mutate: createProduct } = useCreateProduct(
+    () => {
+      toast.success("Product created!");
+      onClose();
+    },
+    (err) => {
+      toast.error("Failed to create product");
+      console.error(err);
+    }
+  );
+
   const [activeTab, setActiveTab] = useState("product-details");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  const handleSubmit = () => {
+    createProduct(form);
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -27,6 +103,10 @@ export default function ProductForm({ onClose }: ProductFormProps) {
       const url = URL.createObjectURL(file);
       setImageUrl(url);
     }
+  };
+
+  const handleChange = (field: keyof typeof form, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -106,12 +186,22 @@ export default function ProductForm({ onClose }: ProductFormProps) {
             <div className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="product-title">Product Title</Label>
-                <Input id="product-title" placeholder="Enter product title" />
+                <Input
+                  id="product-title"
+                  placeholder="Enter product title"
+                  value={form.title}
+                  onChange={(e) => handleChange("title", e.target.value)}
+                />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="product-sku">SKU</Label>
-                <Input id="product-sku" placeholder="Enter product SKU" />
+                <Input
+                  id="product-sku"
+                  placeholder="Enter product SKU"
+                  value={form.sku}
+                  onChange={(e) => handleChange("sku", e.target.value)}
+                />
               </div>
 
               <div className="space-y-2">
@@ -119,6 +209,8 @@ export default function ProductForm({ onClose }: ProductFormProps) {
                 <Input
                   id="product-barcode"
                   placeholder="Enter product barcode"
+                  value={form.barcode}
+                  onChange={(e) => handleChange("barcode", e.target.value)}
                 />
               </div>
             </div>
@@ -127,32 +219,50 @@ export default function ProductForm({ onClose }: ProductFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="weight">Weight</Label>
-              <Input id="weight" placeholder="Enter product weight" />
+              <Input
+                id="weight"
+                placeholder="Enter product weight"
+                value={form.productWeight}
+                onChange={(e) => handleChange("productWeight", e.target.value)}
+              />
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="length">Length</Label>
-              <Input id="length" placeholder="Enter product length" />
+              <Input
+                id="length"
+                placeholder="Enter product length"
+                value={form.productLength}
+                onChange={(e) => handleChange("productLength", e.target.value)}
+              />
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="width">Width</Label>
-              <Input id="width" placeholder="Enter product width" />
+              <Input
+                id="width"
+                placeholder="Enter product width"
+                value={form.productWidth}
+                onChange={(e) => handleChange("productWidth", e.target.value)}
+              />
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="height">Height</Label>
-              <Input id="height" placeholder="Enter product height" />
+              <Input
+                id="height"
+                placeholder="Enter product height"
+                value={form.productHeight}
+                onChange={(e) => handleChange("productHeight", e.target.value)}
+              />
             </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="supplier">Supplier</Label>
-            <Select>
+            <Select
+              value={form.supplierId}
+              onValueChange={(value) => handleChange("supplierId", value)}
+            >
               <SelectTrigger>
-                <SelectValue placeholder="Choose supplier from brand's listse" />
+                <SelectValue placeholder="Choose supplier" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="supplier1">Supplier 1</SelectItem>
@@ -167,36 +277,27 @@ export default function ProductForm({ onClose }: ProductFormProps) {
         <TabsContent value="shipping-details" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="weight-shipping">Weight</Label>
-                <Input
-                  id="weight-shipping"
-                  placeholder="Enter product weight"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="length-shipping">Length</Label>
-                <Input
-                  id="length-shipping"
-                  placeholder="Enter product length"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="width-shipping">Width</Label>
-                <Input id="width-shipping" placeholder="Enter product width" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="height-shipping">Height</Label>
-                <Input
-                  id="height-shipping"
-                  placeholder="Enter product height"
-                />
-              </div>
+              {[
+                "cartonWeight",
+                "cartonLength",
+                "cartonWidth",
+                "cartonHeight",
+              ].map((field, idx) => (
+                <div className="space-y-2" key={field}>
+                  <Label htmlFor={field}>{field.replace("shipping", "")}</Label>
+                  <Input
+                    id={field}
+                    placeholder={`Enter product ${field
+                      .replace("shipping", "")
+                      .toLowerCase()}`}
+                    value={form[field as keyof typeof form]}
+                    onChange={(e) =>
+                      handleChange(field as keyof typeof form, e.target.value)
+                    }
+                  />
+                </div>
+              ))}
             </div>
-
             <div className="flex items-center justify-center">
               <img
                 src="/images/box.png"
@@ -208,12 +309,22 @@ export default function ProductForm({ onClose }: ProductFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="country-origin">Country origin</Label>
-            <Input id="country-origin" placeholder="Enter country origin" />
+            <Input
+              id="country-origin"
+              placeholder="Enter country origin"
+              value={form.countryOrigin}
+              onChange={(e) => handleChange("countryOrigin", e.target.value)}
+            />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="hs-code">HS code</Label>
-            <Input id="hs-code" placeholder="Enter HS code" />
+            <Input
+              id="hs-code"
+              placeholder="Enter HS code"
+              value={form.hsCode}
+              onChange={(e) => handleChange("hsCode", e.target.value)}
+            />
           </div>
 
           <div className="space-y-2">
@@ -222,6 +333,10 @@ export default function ProductForm({ onClose }: ProductFormProps) {
               id="customs-description"
               placeholder="Customs Description"
               className="h-32"
+              value={form.customsDescription}
+              onChange={(e) =>
+                handleChange("customsDescription", e.target.value)
+              }
             />
           </div>
         </TabsContent>
@@ -230,7 +345,10 @@ export default function ProductForm({ onClose }: ProductFormProps) {
         <TabsContent value="inventory-planning" className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="warehouse">Warehouse</Label>
-            <Select>
+            <Select
+              value={form.warehouseId}
+              onValueChange={(value) => handleChange("warehouseId", value)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Choose warehouse" />
               </SelectTrigger>
@@ -247,29 +365,49 @@ export default function ProductForm({ onClose }: ProductFormProps) {
             <Input
               id="emergency-stock"
               placeholder="Enter the lowest stock level"
+              value={form.emergencyStockLevel}
+              onChange={(e) => handleChange("emergencyStockLevel", e.target.value)}
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="product-lead-time">Product lead time</Label>
-            <Input id="product-lead-time" placeholder="e.g. 14 days" />
+            <Input
+              id="product-lead-time"
+              placeholder="e.g. 14 days"
+              value={form.productionLeadTime}
+              onChange={(e) => handleChange("productionLeadTime", e.target.value)}
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="moq">MOQ</Label>
-              <Input id="moq" placeholder="Minimum order quantity" />
+              <Input
+                id="moq"
+                placeholder="Minimum order quantity"
+                value={form.moq}
+                onChange={(e) => handleChange("moq", e.target.value)}
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="cogs">COGs</Label>
-              <Input id="cogs" placeholder="Cost of Goods Sold" />
+              <Input
+                id="cogs"
+                placeholder="Cost of Goods Sold"
+                value={form.cogs}
+                onChange={(e) => handleChange("cogs", e.target.value)}
+              />
             </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="payment-terms">Payment terms</Label>
-            <Select>
+            <Select
+              value={form.paymentTerms}
+              onValueChange={(value) => handleChange("paymentTerms", value)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Payment terms" />
               </SelectTrigger>
@@ -283,7 +421,10 @@ export default function ProductForm({ onClose }: ProductFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="freight">Freight</Label>
-            <Select>
+            <Select
+              value={form.freightId}
+              onValueChange={(value) => handleChange("freightId", value)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Freight solution" />
               </SelectTrigger>
@@ -304,7 +445,7 @@ export default function ProductForm({ onClose }: ProductFormProps) {
         </Button>
         <div className="space-x-2">
           <Button variant="outline">Save as Draft</Button>
-          <Button>Save</Button>
+          <Button onClick={handleSubmit}>Save</Button>
         </div>
       </div>
     </div>

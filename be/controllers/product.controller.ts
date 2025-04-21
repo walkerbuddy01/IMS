@@ -11,6 +11,7 @@ import { asyncHandler } from "../lib/AsyncHandler";
 export const createProduct = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const productDetails = req.body;
+    console.log("productDetails-------------->", productDetails);
     // const userId = req.cookies;
     const supplierId = productDetails.supplierId;
     const warehouseId = productDetails.warehouseId;
