@@ -5,6 +5,7 @@ import { HttpStatusCode } from "../lib/const";
 import FreightOption from "../models/frieght.model";
 
 // Create a new freight option
+
 export const createFreightOption = async (
   req: Request,
   res: Response
