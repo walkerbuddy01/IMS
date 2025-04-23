@@ -10,10 +10,10 @@ import {
 const router = express.Router();
 
 // Create new supplier
-router.post("/freight-options", createFreightOption);
-router.get("/freight-options", getAllFreightOptions);
-router.get("/freight-options/:id", getFreightOptionById);
-router.put("/freight-options/:id", updateFreightOption);
-router.delete("/freight-options/:id", deleteFreightOption);
+router.post("/", createFreightOption);
+router.get("/", getAllFreightOptions);
+router.get("/:id", getFreightOptionById);
+router.put("/:id", updateFreightOption);
+router.delete("/:id", deleteFreightOption);
 
 export default router;

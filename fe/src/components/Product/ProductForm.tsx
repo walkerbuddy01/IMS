@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,41 +14,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { Package, Truck, ClipboardList } from "lucide-react";
 import { useCreateProduct } from "@/hooks/useCreateProduct";
 import { toast } from "sonner";
+import axios from "axios";
+import { freightOptionsI, supplierI, warehouseI } from "@/pages/ProductList";
 
 interface ProductFormProps {
+  freightOptions: freightOptionsI[];
+  warehouses: warehouseI[];
+  suppliers: supplierI[];
   onClose: () => void;
+  fetchAllProducts: () => void;
 }
 
-// {
-//   "title": "Super Widget 3000",
-//   "sku": "SW3000-0032",
-//   "barcode": "1234567890423",
-//   "originalPrice": 25.5,
-//   "cogs": 20.0,
-//   "retail": 49.99,
-//   "supplierId": "6801f7fb8be1eb8cd8a429bf",
-//   "warehouseId": "67fe3cea5632b7bebd2549d8",
-//   "emergencyStockLevel": 10,
-//   "moq": 50,
-//   "productionLeadTime": 7,
-//   "freightId": "67fe40f062c92e7f85655235",
-//   "paymentTerms": "Net 30",
-//   "ProductImageUrl": "https://example.com/images/product1.jpg",
-//   "status": "active",
-//   "cartonWeight": 12.5,
-//   "cartonLength": 60,
-//   "cartonWidth": 40,
-//   "cartonHeight": 30,
-//   "countryOrigin": "China",
-//   "hsCode": "84733020",
-//   "customsDescription": "High-performance industrial widget",
-//   "productLength": 20,
-//   "productWidth": 15,
-//   "productHeight": 10,
-//   "productWeight": 1.2
-// }
-
-export default function ProductForm({ onClose }: ProductFormProps) {
+export default function ProductForm({
+  freightOptions,
+  warehouses,
+  suppliers,
+  onClose,
+  fetchAllProducts,
+}: ProductFormProps) {
   const [form, setForm] = useState({
     title: "",
     sku: "",
@@ -56,12 +39,12 @@ export default function ProductForm({ onClose }: ProductFormProps) {
     originalPrice: 0,
     cogs: 0,
     retail: 0,
-    supplierId: "6801f7fb8be1eb8cd8a429bf",
-    warehouseId: "67fe3cea5632b7bebd2549d8",
+    supplierId: "",
+    warehouseId: "",
     emergencyStockLevel: 0,
     moq: 0,
     productionLeadTime: 0,
-    freightId: "67fe40f062c92e7f85655235",
+    freightId: "",
     paymentTerms: "",
     ProductImageUrl: "https://example.com/images/product1.jpg",
     status: "active",
@@ -77,14 +60,15 @@ export default function ProductForm({ onClose }: ProductFormProps) {
     productHeight: 0,
     productWeight: 0,
   });
-  
 
   const { mutate: createProduct } = useCreateProduct(
     () => {
+      fetchAllProducts();
       toast.success("Product created!");
       onClose();
     },
     (err) => {
+      fetchAllProducts();
       toast.error("Failed to create product");
       console.error(err);
     }
@@ -95,6 +79,7 @@ export default function ProductForm({ onClose }: ProductFormProps) {
 
   const handleSubmit = () => {
     createProduct(form);
+   
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -265,9 +250,12 @@ export default function ProductForm({ onClose }: ProductFormProps) {
                 <SelectValue placeholder="Choose supplier" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="supplier1">Supplier 1</SelectItem>
-                <SelectItem value="supplier2">Supplier 2</SelectItem>
-                <SelectItem value="supplier3">Supplier 3</SelectItem>
+                {Array.isArray(suppliers) &&
+                  suppliers.map((supplier) => (
+                    <SelectItem value={supplier._id}>
+                      {supplier.address} {supplier.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
@@ -353,9 +341,12 @@ export default function ProductForm({ onClose }: ProductFormProps) {
                 <SelectValue placeholder="Choose warehouse" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="warehouse1">Warehouse 1</SelectItem>
-                <SelectItem value="warehouse2">Warehouse 2</SelectItem>
-                <SelectItem value="warehouse3">Warehouse 3</SelectItem>
+                {Array.isArray(warehouses) &&
+                  warehouses.map((warehouse) => (
+                    <SelectItem value={warehouse._id}>
+                      {warehouse.address} {warehouse.country}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
@@ -366,7 +357,9 @@ export default function ProductForm({ onClose }: ProductFormProps) {
               id="emergency-stock"
               placeholder="Enter the lowest stock level"
               value={form.emergencyStockLevel}
-              onChange={(e) => handleChange("emergencyStockLevel", e.target.value)}
+              onChange={(e) =>
+                handleChange("emergencyStockLevel", e.target.value)
+              }
             />
           </div>
 
@@ -376,7 +369,9 @@ export default function ProductForm({ onClose }: ProductFormProps) {
               id="product-lead-time"
               placeholder="e.g. 14 days"
               value={form.productionLeadTime}
-              onChange={(e) => handleChange("productionLeadTime", e.target.value)}
+              onChange={(e) =>
+                handleChange("productionLeadTime", e.target.value)
+              }
             />
           </div>
 
@@ -429,10 +424,12 @@ export default function ProductForm({ onClose }: ProductFormProps) {
                 <SelectValue placeholder="Freight solution" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="sea">SEA</SelectItem>
-                <SelectItem value="air">AIR</SelectItem>
-                <SelectItem value="lcl">LCL</SelectItem>
-                <SelectItem value="truck">Truck</SelectItem>
+                {Array.isArray(freightOptions) &&
+                  freightOptions.map((freightOption) => (
+                    <SelectItem value={freightOption._id}>
+                      {freightOption.method} {freightOption.cost}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>

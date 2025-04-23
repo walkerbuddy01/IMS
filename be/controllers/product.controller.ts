@@ -375,10 +375,38 @@ export const getAllProducts = async (
   res: Response
 ): Promise<void> => {
   try {
-    const products = await Product.find();
-    res.json(products);
+    const product = await Product.find()
+      .populate("supplierId")
+      .populate("inventory.warehouseId");
+
+    if (!product) {
+      res
+        .status(HttpStatusCode.NOT_FOUND)
+        .json(
+          new ApiError(
+            HttpStatusCode.NOT_FOUND,
+            "Product with the given ID does not exist"
+          )
+        );
+      return;
+    }
+
+    res
+      .status(HttpStatusCode.CREATED)
+      .json(
+        new ApiResponse(
+          HttpStatusCode.CREATED,
+          product,
+          "Products fetched successfully"
+        )
+      );
   } catch (error) {
-    res.status(500).json({ error: (error as Error).message });
+        console.error("Server Error", error);
+    res
+      .status(HttpStatusCode.SERVER_ERROR)
+      .json(
+        new ApiError(HttpStatusCode.SERVER_ERROR, (error as Error).message)
+      );
   }
 };
 

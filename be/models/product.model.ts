@@ -85,7 +85,7 @@ const productSchema = new Schema<IProduct>(
       },
       countryOrigin: { type: String, required: true },
       hsCode: { type: String, required: true },
-      customsDescription: { type: String, required: true },
+      customsDescription: { type: String },
 
     },
 
