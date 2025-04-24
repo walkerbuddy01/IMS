@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-
 const supplierSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -11,6 +10,9 @@ const supplierSchema = new mongoose.Schema(
     country: { type: String },
     paymentTerms: { type: String },
     leadTime: { type: Number }, // in days
+    percentage: {
+      type: Number,
+    },
   },
   {
     timestamps: true,

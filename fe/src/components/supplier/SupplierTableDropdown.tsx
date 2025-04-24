@@ -47,51 +47,6 @@ export function SupplierTableDropdown({
   );
 }
 
-export function PaymentTermsDropdown({
-  value,
-  setValue,
-  options,
-}: {
-  value: string;
-  setValue: (v: string) => void;
-  options: string[];
-}) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="relative">
-      <Button
-        variant="outline"
-        className="w-44 px-4 py-2 flex justify-between items-center text-[#262b40] bg-white border"
-        onClick={() => setOpen(!open)}
-      >
-        {value}
-        <ArrowDown
-          className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`}
-        />
-      </Button>
-      {open && (
-        <div className="absolute left-0 mt-2 w-44 rounded-lg shadow-lg bg-white border z-50">
-          {options.map((term, i) => (
-            <button
-              key={i}
-              onClick={() => {
-                setValue(term);
-                setOpen(false);
-              }}
-              className={`block w-full text-left px-4 py-2 text-[#262b40] text-sm hover:bg-[#f0f4fe] ${
-                value === term
-                  ? "bg-[#afd0fb]/60 font-semibold text-[#1D2460]"
-                  : ""
-              }`}
-            >
-              {term}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 interface RowActionDropdownProps {
   supplier: {
@@ -104,7 +59,7 @@ interface RowActionDropdownProps {
   };
 }
 
-export function RowActionDropdown({ supplier }: RowActionDropdownProps) {
+export function RowActionDropdown() {
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
 
@@ -147,10 +102,10 @@ export function RowActionDropdown({ supplier }: RowActionDropdownProps) {
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="max-w-4xl h-fit p-0">
-          <EditSupplierDialog
+          {/* <EditSupplierDialog
             // supplier={supplier}
             onClose={() => setEditOpen(false)}
-          />
+          /> */}
         </DialogContent>
       </Dialog>
     </div>

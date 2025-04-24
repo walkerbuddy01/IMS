@@ -10,8 +10,27 @@ export const createSupplier = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const supplierDetails = req.body;
 
+    const line1 = supplierDetails.line1;
+    const line2 = supplierDetails.line2;
+    const Suburb = supplierDetails.Suburb;
+    const state = supplierDetails.state;
+
+    if (!line1 && !line2 && !Suburb && !state) {
+      res
+        .status(HttpStatusCode.NOT_FOUND)
+        .json(
+          new ApiError(
+            HttpStatusCode.NOT_FOUND,
+            "line1, line2, subrub, state all this are required for complete address"
+          )
+        );
+      return;
+    }
+
+    const address = [line1, line2, Suburb, state].join(", ");
+
     // Basic check for presence
-    if (!supplierDetails || !supplierDetails.name) {
+    if (!supplierDetails || !supplierDetails.supplierName) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .json(
@@ -51,14 +70,15 @@ export const createSupplier = asyncHandler(
 
       // Create new supplier
       const newSupplier = await Supplier.create({
-        name: supplierDetails.name,
+        name: supplierDetails.supplierName,
         contactPerson: supplierDetails.contactPerson,
         email: supplierDetails.email,
         phone: supplierDetails.phone,
-        address: supplierDetails.address,
+        address,
         country: supplierDetails.country,
         paymentTerms: supplierDetails.paymentTerms,
         leadTime: supplierDetails.leadTime,
+        percentage: supplierDetails.percentage,
       });
 
       res
@@ -223,9 +243,7 @@ export const getSupplierById = asyncHandler(
       if (!supplier) {
         res
           .status(HttpStatusCode.NOT_FOUND)
-          .json(
-            new ApiError(HttpStatusCode.NOT_FOUND, "Supplier not found")
-          );
+          .json(new ApiError(HttpStatusCode.NOT_FOUND, "Supplier not found"));
         return;
       }
 
@@ -247,4 +265,3 @@ export const getSupplierById = asyncHandler(
     }
   }
 );
-
