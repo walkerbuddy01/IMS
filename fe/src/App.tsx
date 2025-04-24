@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +12,8 @@ import NotFound from "./pages/NotFound";
 import DashboardLayout from "./components/DashboardLayout";
 import ProductList from "./pages/ProductList";
 import SuppliersList from "./pages/Supplier";
+import SaleDataInput from "./pages/SaleDataInput";
+import ShippingLeadTime from "./pages/ShippingLeadTime";
 
 const queryClient = new QueryClient();
 
@@ -27,21 +28,32 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          
+
           {/* Dashboard routes with layout */}
           <Route path="/" element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/inventory" element={<Inventory />} />
-            <Route path="/sale-forecast" element={<Dashboard />} /> {/* Placeholder */}
-            <Route path="/inventory-forecast" element={<Dashboard />} /> {/* Placeholder */}
-            <Route path="/product-list" element={<ProductList />} /> {/* Placeholder */}
-            <Route path="/packing-list" element={<Dashboard />} /> {/* Placeholder */}
-            <Route path="/shipping-lead-time" element={<Dashboard />} /> {/* Placeholder */}
-            <Route path="/sale-data-input" element={<Dashboard />} /> {/* Placeholder */}
-            <Route path="/suppliers-list" element={<SuppliersList />} /> {/* Placeholder */}
-            <Route path="/settings" element={<Dashboard />} /> {/* Placeholder */}
+            <Route path="/sale-forecast" element={<Dashboard />} />{" "}
+            {/* Placeholder */}
+            <Route path="/inventory-forecast" element={<Dashboard />} />{" "}
+            {/* Placeholder */}
+            <Route path="/product-list" element={<ProductList />} />{" "}
+            {/* Placeholder */}
+            <Route path="/packing-list" element={<Dashboard />} />{" "}
+            {/* Placeholder */}
+            <Route
+              path="/shipping-lead-time"
+              element={<ShippingLeadTime />}
+            />{" "}
+            {/* Placeholder */}
+            <Route path="/sale-data-input" element={<SaleDataInput />} />{" "}
+            {/* Placeholder */}
+            <Route path="/suppliers-list" element={<SuppliersList />} />{" "}
+            {/* Placeholder */}
+            <Route path="/settings" element={<Dashboard />} />{" "}
+            {/* Placeholder */}
           </Route>
-          
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
